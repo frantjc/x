@@ -6,7 +6,7 @@ import (
 )
 
 func MakePath(s ...string) string {
-	u := []string {}
+	u := []string{}
 
 	for _, t := range s {
 		if t != "" {

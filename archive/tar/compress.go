@@ -21,11 +21,11 @@ var (
 			if sourceDateEpoch == "" {
 				return 0
 			}
-	
+
 			if seconds, err := strconv.Atoi(sourceDateEpoch); err == nil {
 				return time.Second * time.Duration(seconds)
 			}
-	
+
 			return 0
 		}())
 )
@@ -33,7 +33,7 @@ var (
 func Compress(dir string) io.ReadCloser {
 	var (
 		pr, pw = io.Pipe()
-		tw = tar.NewWriter(pw)
+		tw     = tar.NewWriter(pw)
 	)
 
 	go func() {
