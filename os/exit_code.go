@@ -41,16 +41,20 @@ func NewExitCodeError(err error, exitCode int) *ExitCodeError {
 	return e
 }
 
-func ExitFromError(err error) {
+func ErrorExitCode(err error) int {
 	if err == nil {
-		os.Exit(0)
+		return 0
 	}
 
 	e := &ExitCodeError{}
 
 	if errors.As(err, &e) {
-		os.Exit(e.ExitCode)
+		return e.ExitCode
 	}
 
-	os.Exit(1)
+	return 1
+}
+
+func ExitFromError(err error) {
+	os.Exit(ErrorExitCode(err))
 }

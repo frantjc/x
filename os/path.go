@@ -3,16 +3,15 @@ package xos
 import (
 	"os"
 	"strings"
+
+	xslice "github.com/frantjc/x/slice"
 )
 
-func MakePath(s ...string) string {
-	u := []string{}
-
-	for _, t := range s {
-		if t != "" {
-			u = append(u, t)
-		}
-	}
-
-	return strings.Join(u, string(os.PathListSeparator))
+func JoinPath(s ...string) string {
+	return strings.Join(
+		xslice.Filter(s, func(t string, i int) bool {
+			return t != "" && i == xslice.IndexOf(s, t)
+		}),
+		string(os.PathListSeparator),
+	)
 }

@@ -24,46 +24,45 @@ func Subdir(r io.Reader, subdir string) io.ReadCloser {
 	)
 
 	go func() {
-		defer pw.Close()
-
 		tr, tw := tar.NewReader(r), tar.NewWriter(iw)
-		defer tw.Close()
+		err := func() error {
+			for {
+				f, err := tr.Next()
+				if errors.Is(err, io.EOF) {
+					if !found {
+						return ErrEmptySubdir
+					}
 
-		for {
-			f, err := tr.Next()
-			if errors.Is(err, io.EOF) {
-				if !found {
-					_ = pw.CloseWithError(ErrEmptySubdir)
+					break
+				} else if err != nil {
+					return err
 				}
 
-				break
-			} else if err != nil {
-				_ = pw.CloseWithError(err)
-				break
+				if !strings.HasPrefix(f.Name, subdir) {
+					continue
+				}
+
+				found = true
+				f.Name = f.Name[lenSubdir:]
+
+				if f.Name == "" || f.Name == "/" {
+					continue
+				}
+
+				if err := tw.WriteHeader(f); err != nil {
+					return err
+				}
+
+				//nolint:gosec
+				if _, err := io.Copy(tw, tr); err != nil {
+					return err
+				}
 			}
 
-			if !strings.HasPrefix(f.Name, subdir) {
-				continue
-			}
+			return nil
+		}()
 
-			found = true
-			f.Name = f.Name[lenSubdir:]
-
-			if f.Name == "" || f.Name == "/" {
-				continue
-			}
-
-			if err := tw.WriteHeader(f); err != nil {
-				_ = pw.CloseWithError(err)
-				break
-			}
-
-			//nolint:gosec
-			if _, err := io.Copy(tw, tr); err != nil {
-				_ = pw.CloseWithError(err)
-				break
-			}
-		}
+		_ = pw.CloseWithError(errors.Join(err, tw.Close()))
 	}()
 
 	return pr

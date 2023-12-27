@@ -3,7 +3,7 @@ package xslice_test
 import (
 	"testing"
 
-	"github.com/frantjc/x/slice"
+	xslice "github.com/frantjc/x/slice"
 )
 
 func TestComparableIncludesTrue(t *testing.T) {

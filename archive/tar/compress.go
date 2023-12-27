@@ -11,32 +11,28 @@ import (
 	"time"
 )
 
-var (
-	// ModTime is used as the ModTime of each
-	// tar.Header so as to make the resulting
-	// tarball have the same digest.
-	ModTime = time.Date(1970, time.January, 1, 0, 0, 0, 0, time.UTC).
-		Add(func() time.Duration {
-			sourceDateEpoch := os.Getenv("SOURCE_DATE_EPOCH")
-			if sourceDateEpoch == "" {
-				return 0
-			}
-
-			if seconds, err := strconv.Atoi(sourceDateEpoch); err == nil {
-				return time.Second * time.Duration(seconds)
-			}
-
+// ModTime is used as the ModTime of each
+// tar.Header so as to make the resulting
+// tarball have the same digest.
+var ModTime = time.Date(1970, time.January, 1, 0, 0, 0, 0, time.UTC).
+	Add(func() time.Duration {
+		sourceDateEpoch := os.Getenv("SOURCE_DATE_EPOCH")
+		if sourceDateEpoch == "" {
 			return 0
-		}())
-)
+		}
+
+		if seconds, err := strconv.Atoi(sourceDateEpoch); err == nil {
+			return time.Second * time.Duration(seconds)
+		}
+
+		return 0
+	}())
 
 func Compress(dir string) io.ReadCloser {
-	var (
-		pr, pw = io.Pipe()
-		tw     = tar.NewWriter(pw)
-	)
+	pr, pw := io.Pipe()
 
 	go func() {
+		tw := tar.NewWriter(pw)
 		err := filepath.WalkDir(dir, func(path string, di fs.DirEntry, err error) error {
 			if err != nil {
 				return err
