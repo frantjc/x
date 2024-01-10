@@ -48,7 +48,9 @@ func ErrorExitCode(err error) int {
 
 	e := &ExitCodeError{}
 
-	if errors.As(err, &e) {
+	// For some reason, sometimes this return true
+	// but sets e = nil, so we have to double check.
+	if errors.As(err, &e) && e != nil {
 		return e.ExitCode
 	}
 
