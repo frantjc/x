@@ -2,7 +2,6 @@ package xtar
 
 import (
 	"archive/tar"
-	"errors"
 	"io"
 	"io/fs"
 	"os"
@@ -14,7 +13,9 @@ func Compress(dir string) io.ReadCloser {
 
 	go func() {
 		tw := tar.NewWriter(pw)
-		err := filepath.WalkDir(dir, func(path string, di fs.DirEntry, err error) error {
+		defer tw.Close()
+
+		if err := filepath.WalkDir(dir, func(path string, di fs.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
@@ -52,9 +53,9 @@ func Compress(dir string) io.ReadCloser {
 			}
 
 			return nil
-		})
-
-		_ = pw.CloseWithError(errors.Join(err, tw.Close()))
+		}); err != nil {
+			_ = pw.CloseWithError(err)
+		}
 	}()
 
 	return pr
