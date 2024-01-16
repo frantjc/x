@@ -7,26 +7,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strconv"
-	"time"
 )
-
-// ModTime is used as the ModTime of each
-// tar.Header so as to make the resulting
-// tarball have the same digest.
-var ModTime = time.Date(1970, time.January, 1, 0, 0, 0, 0, time.UTC).
-	Add(func() time.Duration {
-		sourceDateEpoch := os.Getenv("SOURCE_DATE_EPOCH")
-		if sourceDateEpoch == "" {
-			return 0
-		}
-
-		if seconds, err := strconv.Atoi(sourceDateEpoch); err == nil {
-			return time.Second * time.Duration(seconds)
-		}
-
-		return 0
-	}())
 
 func Compress(dir string) io.ReadCloser {
 	pr, pw := io.Pipe()
@@ -47,7 +28,6 @@ func Compress(dir string) io.ReadCloser {
 			if err != nil {
 				return err
 			}
-			hdr.ModTime = ModTime
 
 			rel, err := filepath.Rel(dir, path)
 			if err != nil {

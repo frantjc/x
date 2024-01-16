@@ -15,7 +15,7 @@ var ErrEmptySubdir = errors.New("empty tarball subdirectory")
 //
 // If the subdirectory is empty or non-existent, the returned io.ReadCloser
 // is closed with ErrEmptySubdir.
-func Subdir(r io.Reader, subdir string) io.ReadCloser {
+func Subdir(r *tar.Reader, subdir string) io.ReadCloser {
 	var (
 		pr, pw              = io.Pipe()
 		iw        io.Writer = pw
@@ -24,10 +24,10 @@ func Subdir(r io.Reader, subdir string) io.ReadCloser {
 	)
 
 	go func() {
-		tr, tw := tar.NewReader(r), tar.NewWriter(iw)
+		tw := tar.NewWriter(iw)
 		err := func() error {
 			for {
-				f, err := tr.Next()
+				f, err := r.Next()
 				if errors.Is(err, io.EOF) {
 					if !found {
 						return ErrEmptySubdir
@@ -53,8 +53,8 @@ func Subdir(r io.Reader, subdir string) io.ReadCloser {
 					return err
 				}
 
-				//nolint:gosec
-				if _, err := io.Copy(tw, tr); err != nil {
+				
+				if _, err := io.Copy(tw, r); err != nil {
 					return err
 				}
 			}
