@@ -9,7 +9,7 @@ import (
 func TestMappableMap(t *testing.T) {
 	var (
 		a = xslice.ReducibleSlice[int, int]([]int{1, 2, 3, 4})
-		f = func(a, i int) int {
+		f = func(a, _ int) int {
 			return a + 1
 		}
 		expected = xslice.AnySlice[int]([]int{2, 3, 4, 5})
@@ -26,7 +26,7 @@ func TestMappableMap(t *testing.T) {
 func TestReducibleReduceRight(t *testing.T) {
 	var (
 		a = xslice.ReducibleSlice[int, int]([]int{1, 2, 3, 4})
-		f = func(acc, a, i int) int {
+		f = func(acc, a, _ int) int {
 			return acc + a
 		}
 		expected = 10
@@ -41,7 +41,7 @@ func TestReducibleReduceRight(t *testing.T) {
 func TestReducibleReduce(t *testing.T) {
 	var (
 		a = xslice.ReducibleSlice[int, int]([]int{1, 2, 3, 4})
-		f = func(acc, a, i int) int {
+		f = func(acc, a, _ int) int {
 			return acc + a
 		}
 		expected = 10
