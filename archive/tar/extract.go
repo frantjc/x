@@ -69,7 +69,6 @@ func Extract(r *tar.Reader, dir string) error {
 				return err
 			}
 
-			
 			n, err := io.Copy(f, r)
 			if closeErr := f.Close(); closeErr != nil && err == nil {
 				err = closeErr

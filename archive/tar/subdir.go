@@ -53,7 +53,6 @@ func Subdir(r *tar.Reader, subdir string) io.ReadCloser {
 					return err
 				}
 
-				
 				if _, err := io.Copy(tw, r); err != nil {
 					return err
 				}
