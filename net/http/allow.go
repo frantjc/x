@@ -13,12 +13,8 @@ type allowHandler struct {
 }
 
 func (ah *allowHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	Allow(w, r, ah.allowMethods, ah.handler)
-}
-
-func Allow(w http.ResponseWriter, r *http.Request, allowMethods []string, h http.Handler) {
 	if xslice.Includes([]string{http.MethodHead, http.MethodOptions}, r.Method) {
-		allow := strings.Join(allowMethods, ", ")
+		allow := strings.Join(ah.allowMethods, ", ")
 		w.Header().Set("Allow", allow)
 
 		if http.MethodOptions == r.Method {
@@ -28,14 +24,14 @@ func Allow(w http.ResponseWriter, r *http.Request, allowMethods []string, h http
 		}
 	}
 
-	if !xslice.Includes(allowMethods, r.Method) {
+	if !xslice.Includes(ah.allowMethods, r.Method) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
-	h.ServeHTTP(w, r)
+	ah.handler.ServeHTTP(w, r)
 }
 
-func AllowHandler(allowMethods []string, h http.Handler) http.Handler {
+func AllowHandler(h http.Handler, allowMethods []string) http.Handler {
 	return &allowHandler{handler: h, allowMethods: allowMethods}
 }
