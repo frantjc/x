@@ -194,6 +194,11 @@ func (t *digestTransport) newCredentials(req *http.Request, c *challenge) *crede
 	}
 }
 
+var (
+	digestAuthenticationPrefix = "Digest "
+	lenDigestAuthenticationPrefix = len(digestAuthenticationPrefix)
+)
+
 // RoundTrip implements http.RoundTripper.
 func (t *digestTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if t == nil {
@@ -213,17 +218,13 @@ func (t *digestTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		return res, nil
 	}
 
-	var (
-		wwwAuthenticate = strings.TrimSpace(res.Header.Get("WWW-Authenticate"))
-		digestAuthenticationPrefix = "Digest "
-	)
+	wwwAuthenticate := strings.TrimSpace(res.Header.Get("WWW-Authenticate"))
+
 	if !strings.HasPrefix(wwwAuthenticate, digestAuthenticationPrefix) {
 		return nil, fmt.Errorf("bad challenge")
 	}
 
-	wwwAuthenticate = strings.TrimSpace(wwwAuthenticate[len(digestAuthenticationPrefix):])
-
-	chal, err := parseChallenge(wwwAuthenticate)
+	chal, err := parseChallenge(strings.TrimSpace(wwwAuthenticate[lenDigestAuthenticationPrefix:]))
 	if err != nil {
 		return res, err
 	}
