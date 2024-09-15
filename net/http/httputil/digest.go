@@ -1,7 +1,7 @@
 package xhttputil
 
 import (
-	"crypto/md5"
+	"crypto/md5" //nolint:gosec
 	"crypto/rand"
 	"fmt"
 	"io"
@@ -22,8 +22,8 @@ func NewDigestTransport(transport http.RoundTripper, username, password string) 
 }
 
 type digestTransport struct {
-	transport http.RoundTripper
-	username, password  string
+	transport          http.RoundTripper
+	username, password string
 }
 
 type challenge struct {
@@ -36,16 +36,21 @@ type challenge struct {
 	qop       string
 }
 
+var (
+	digestAuthenticationPrefix    = "Digest "
+	lenDigestAuthenticationPrefix = len(digestAuthenticationPrefix)
+)
+
 func parseChallenge(input string) (*challenge, error) {
 	s := strings.TrimSpace(input)
-	if !strings.HasPrefix(s, "Digest ") {
+	if !strings.HasPrefix(s, digestAuthenticationPrefix) {
 		return nil, fmt.Errorf("bad challenge")
 	}
-	s = strings.TrimSpace(s[7:])
+	s = strings.TrimSpace(s[lenDigestAuthenticationPrefix:])
 
 	var (
 		sl = strings.Split(s, ", ")
-		c = &challenge{
+		c  = &challenge{
 			algorithm: "MD5",
 		}
 	)
@@ -55,7 +60,7 @@ func parseChallenge(input string) (*challenge, error) {
 	for i := range sl {
 		if r := strings.SplitN(sl[i], "=", 2); len(r) != 2 {
 			return nil, fmt.Errorf("bad challenge")
-		} else {
+		} else { //nolint:revive
 			switch r[0] {
 			case "realm":
 				c.realm = strings.Trim(r[1], qs)
@@ -95,7 +100,7 @@ type credentials struct {
 }
 
 func sumMD5(data string) string {
-	hf := md5.New()
+	hf := md5.New() //nolint:gosec
 	_, _ = io.WriteString(hf, data)
 	return fmt.Sprintf("%x", hf.Sum(nil))
 }
@@ -194,11 +199,6 @@ func (t *digestTransport) newCredentials(req *http.Request, c *challenge) *crede
 	}
 }
 
-var (
-	digestAuthenticationPrefix = "Digest "
-	lenDigestAuthenticationPrefix = len(digestAuthenticationPrefix)
-)
-
 // RoundTrip implements http.RoundTripper.
 func (t *digestTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if t == nil {
@@ -218,13 +218,7 @@ func (t *digestTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		return res, nil
 	}
 
-	wwwAuthenticate := strings.TrimSpace(res.Header.Get("WWW-Authenticate"))
-
-	if !strings.HasPrefix(wwwAuthenticate, digestAuthenticationPrefix) {
-		return nil, fmt.Errorf("bad challenge")
-	}
-
-	chal, err := parseChallenge(strings.TrimSpace(wwwAuthenticate[lenDigestAuthenticationPrefix:]))
+	chal, err := parseChallenge(res.Header.Get("WWW-Authenticate"))
 	if err != nil {
 		return res, err
 	}
