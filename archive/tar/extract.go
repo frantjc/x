@@ -99,6 +99,10 @@ func Extract(r *tar.Reader, dir string) error {
 			}
 
 			madeDir[abs] = true
+		case mode&os.ModeSymlink != 0:
+			if err := os.Symlink(hdr.Linkname, abs); err != nil {
+				return fmt.Errorf("creating symlink %s -> %s: %v", abs, hdr.Linkname, err)
+			}
 		default:
 			return fmt.Errorf("tar file entry %s contained unsupported file type: %v", hdr.Name, mode)
 		}
