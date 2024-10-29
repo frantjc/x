@@ -3,7 +3,7 @@ package xslice
 // Sort creates a new array by sorting the elements of
 // the given array and returns the sorted array.
 // The sort order is ascending.
-func Sort[T comparable](in []T, f func(a, b T) int) []T {
+func Sort[T any](in []T, f func(a, b T) int) []T {
 	out := in
 	k := len(out)
 	for i := 0; i < k; i++ {
