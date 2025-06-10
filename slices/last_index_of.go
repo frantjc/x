@@ -1,4 +1,4 @@
-package xslice
+package xslices
 
 // LastIndexOf returns the last index at which a given element
 // can be found in the array, or -1 if it is not present.

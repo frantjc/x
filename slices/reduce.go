@@ -1,4 +1,4 @@
-package xslice
+package xslices
 
 // Reduce executes a user-supplied "reducer" callback function
 // on each element of the array, in order, passing in the return

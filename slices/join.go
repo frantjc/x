@@ -1,4 +1,4 @@
-package xslice
+package xslices
 
 import "fmt"
 

@@ -2,15 +2,19 @@ package xos
 
 import (
 	"os"
+	"slices"
 	"strings"
 
-	xslice "github.com/frantjc/x/slice"
+	xslices "github.com/frantjc/x/slices"
 )
 
 func JoinPath(s ...string) string {
+	i := -1
+
 	return strings.Join(
-		xslice.Filter(s, func(t string, i int) bool {
-			return t != "" && i == xslice.IndexOf(s, t)
+		slices.DeleteFunc(s, func(t string) bool {
+			i++
+			return t == "" || i != xslices.IndexOf(s, t)
 		}),
 		string(os.PathListSeparator),
 	)

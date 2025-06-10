@@ -1,8 +1,8 @@
-package xslice
+package xslices
 
 // Reverse creates a new array by reversing the given array.
 // The first array element becomes the last, and the last array element becomes the first.
-func Reverse[T any](in []T) AnySlice[T] {
+func Reverse[T any](in []T) []T {
 	j := len(in)
 	out := make([]T, j)
 	k := j - 1

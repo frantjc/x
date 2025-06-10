@@ -1,4 +1,4 @@
-package xslice
+package xslices
 
 // Some tests whether at least one element in the array passes
 // the test implemented by the provided function.

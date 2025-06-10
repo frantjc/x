@@ -1,4 +1,4 @@
-package xslice
+package xslices
 
 // FindIndex returns the index of the first element in the array
 // that satisfies the provided testing function. Otherwise, it returns -1,

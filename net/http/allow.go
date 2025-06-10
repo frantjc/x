@@ -2,9 +2,8 @@ package xhttp
 
 import (
 	"net/http"
+	"slices"
 	"strings"
-
-	xslice "github.com/frantjc/x/slice"
 )
 
 type allowHandler struct {
@@ -13,7 +12,7 @@ type allowHandler struct {
 }
 
 func (ah *allowHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if xslice.Includes([]string{http.MethodHead, http.MethodOptions}, r.Method) {
+	if slices.Contains([]string{http.MethodHead, http.MethodOptions}, r.Method) {
 		allow := strings.Join(ah.allowMethods, ", ")
 		w.Header().Set("Allow", allow)
 
@@ -24,7 +23,7 @@ func (ah *allowHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if !xslice.Includes(ah.allowMethods, r.Method) {
+	if !slices.Contains(ah.allowMethods, r.Method) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}

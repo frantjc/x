@@ -1,4 +1,4 @@
-package xslice
+package xslices
 
 // Slice returns a shallow copy of a portion
 // of an array into a new array object selected
@@ -8,7 +8,7 @@ package xslice
 //
 // If start<0, it is treated as distance from the end of the array.
 // If end<=0, it is treated as distance from the end of the array.
-func Slice[T any](in []T, start, end int) AnySlice[T] {
+func Slice[T any](in []T, start, end int) []T {
 	if start > end {
 		return make([]T, 0)
 	}

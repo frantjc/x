@@ -1,4 +1,4 @@
-package xslice
+package xslices
 
 // ForEach executes a provided function once
 // for each array element.
